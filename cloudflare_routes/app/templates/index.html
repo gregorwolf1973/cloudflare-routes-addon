@@ -65,7 +65,7 @@
       <div class="card-header"><i class="bi bi-diagram-3-fill me-2"></i>DNS-Verwaltung</div>
       <div class="card-body">
         <p class="text-muted small">DNS-Einträge deiner Zone anzeigen, erstellen und löschen.</p>
-        <a href="/dns" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>DNS-Einträge öffnen</a>
+        <a href="{{ url_for('dns_records') }}" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>DNS-Einträge öffnen</a>
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@
       <div class="card-header"><i class="bi bi-bezier2 me-2"></i>Tunnel-Routen</div>
       <div class="card-body">
         <p class="text-muted small">Cloudflare Tunnel verwalten und neue Routen konfigurieren.</p>
-        <a href="/tunnels" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Tunnel öffnen</a>
+        <a href="{{ url_for('tunnels') }}" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Tunnel öffnen</a>
       </div>
     </div>
   </div>
@@ -92,7 +92,7 @@
         <p class="text-muted small">
           Cloudflare IP-Bereiche automatisch in <code>configuration.yaml</code> eintragen.
         </p>
-        <a href="/proxies" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Proxies verwalten</a>
+        <a href="{{ url_for('proxies') }}" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Proxies verwalten</a>
       </div>
     </div>
   </div>
@@ -101,7 +101,7 @@
       <div class="card-header"><i class="bi bi-terminal-fill me-2"></i>NPM-Konfigurationshilfe</div>
       <div class="card-body">
         <p class="text-muted small">Nginx Proxy Manager Einstellungen und Nginx-Konfiguration generieren.</p>
-        <a href="/npm" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>NPM-Hilfe öffnen</a>
+        <a href="{{ url_for('npm_helper') }}" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>NPM-Hilfe öffnen</a>
       </div>
     </div>
   </div>

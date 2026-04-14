@@ -8,9 +8,23 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import ha_config
 from cloudflare_api import CloudflareAPI
 
+
+class IngressFix:
+    """Setzt SCRIPT_NAME aus dem X-Ingress-Path Header den HA schickt,
+    damit url_for() korrekte absolute Pfade erzeugt."""
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        ingress_path = environ.get("HTTP_X_INGRESS_PATH", "").rstrip("/")
+        if ingress_path:
+            environ["SCRIPT_NAME"] = ingress_path
+        return self.app(environ, start_response)
+
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_prefix=1)
+app.wsgi_app = IngressFix(ProxyFix(app.wsgi_app, x_for=1, x_proto=1))
 
 OPTIONS_FILE = "/data/options.json"
 PORT = int(os.environ.get("INGRESS_PORT", 8200))

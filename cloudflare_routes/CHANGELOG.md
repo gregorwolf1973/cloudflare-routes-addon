@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+- Fix: 404-Fehler bei Navigation hinter HA-Ingress (alle Links auf url_for() umgestellt)
+- Fix: IngressFix-Middleware liest X-Ingress-Path Header und setzt SCRIPT_NAME korrekt
+
 ## 1.0.1
 - Fix: `!include`-Tags in `configuration.yaml` führten nicht mehr zum Absturz (Custom YAML-Loader)
 - Fix: Dashboard-500-Fehler wenn trusted_proxies nicht gelesen werden konnten

@@ -93,33 +93,33 @@
       <hr style="border-color:var(--cf-border); margin: 0 0.5rem 0.75rem;">
       <ul class="nav flex-column flex-grow-1">
         <li class="nav-item">
-          <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">
+          <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
             <i class="bi bi-speedometer2"></i> Dashboard
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.endpoint == 'dns_records' %}active{% endif %}" href="/dns">
+          <a class="nav-link {% if request.endpoint == 'dns_records' %}active{% endif %}" href="{{ url_for('dns_records') }}">
             <i class="bi bi-diagram-3-fill"></i> DNS-Einträge
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if 'tunnel' in (request.endpoint or '') %}active{% endif %}" href="/tunnels">
+          <a class="nav-link {% if 'tunnel' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('tunnels') }}">
             <i class="bi bi-bezier2"></i> Tunnel-Routen
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if 'prox' in (request.endpoint or '') %}active{% endif %}" href="/proxies">
+          <a class="nav-link {% if 'prox' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('proxies') }}">
             <i class="bi bi-shield-check-fill"></i> Trusted Proxies
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if 'npm' in (request.endpoint or '') %}active{% endif %}" href="/npm">
+          <a class="nav-link {% if 'npm' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('npm_helper') }}">
             <i class="bi bi-terminal-fill"></i> NPM-Hilfe
           </a>
         </li>
       </ul>
       <div style="padding: 0.75rem; font-size: 0.7rem; color: #374151; text-align:center;">
-        v1.0.1
+        v1.0.2
       </div>
     </nav>
 

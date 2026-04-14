@@ -28,7 +28,7 @@
         {% endif %}
       </div>
       <div class="col-md-4 text-end">
-        <form method="POST" action="/proxies/update" class="d-inline">
+        <form method="POST" action="{{ url_for('update_proxies') }}" class="d-inline">
           <div class="form-check form-switch d-inline-flex align-items-center me-3">
             <input class="form-check-input me-2" type="checkbox" name="include_ipv6" value="true" id="ipv6switch" checked>
             <label class="form-check-label small text-muted" for="ipv6switch">IPv6</label>
@@ -37,7 +37,7 @@
             <i class="bi bi-arrow-clockwise me-1"></i>Aktualisieren
           </button>
         </form>
-        <form method="POST" action="/proxies/remove" class="d-inline ms-2"
+        <form method="POST" action="{{ url_for('remove_proxies') }}" class="d-inline ms-2"
               onsubmit="return confirm('Alle Cloudflare IPs aus trusted_proxies entfernen?')">
           <button type="submit" class="btn btn-outline-danger btn-sm">
             <i class="bi bi-x-lg me-1"></i>Entfernen

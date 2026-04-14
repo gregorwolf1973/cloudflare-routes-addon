@@ -10,7 +10,7 @@
     <div class="card">
       <div class="card-header"><i class="bi bi-sliders me-2"></i>Route konfigurieren</div>
       <div class="card-body">
-        <form method="POST" action="/npm/generate">
+        <form method="POST" action="{{ url_for('npm_generate') }}">
           <div class="mb-3">
             <label class="form-label small text-muted">Öffentlicher Hostname</label>
             <input type="text" name="hostname" class="form-control form-control-sm"
