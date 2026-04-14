@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloudflare Route Manager</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --cf-orange: #f48024;
+      --cf-dark: #1b1b2f;
+      --cf-card: #16213e;
+      --cf-border: #2d3748;
+      --cf-header: #0f3460;
+    }
+    body { background: var(--cf-dark); color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .sidebar {
+      background: var(--cf-card);
+      min-height: 100vh;
+      border-right: 1px solid var(--cf-border);
+      padding: 1rem 0.75rem;
+    }
+    .sidebar-brand { color: var(--cf-orange); font-weight: 700; font-size: 1.1rem; }
+    .sidebar .nav-link { color: #9ca3af; padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 2px; }
+    .sidebar .nav-link:hover { color: var(--cf-orange); background: rgba(244,128,36,0.08); }
+    .sidebar .nav-link.active { color: var(--cf-orange); background: rgba(244,128,36,0.15); font-weight: 600; }
+    .sidebar .nav-link i { width: 20px; text-align: center; margin-right: 6px; }
+    .card { background: var(--cf-card); border: 1px solid var(--cf-border); border-radius: 10px; }
+    .card-header {
+      background: var(--cf-header);
+      border-bottom: 1px solid var(--cf-border);
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    .table { color: #e0e0e0; }
+    .table thead th { background: var(--cf-header); border-color: var(--cf-border); color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .table td { border-color: var(--cf-border); vertical-align: middle; }
+    .table tbody tr:hover { background: rgba(255,255,255,0.03); }
+    .btn-cf { background: var(--cf-orange); border-color: var(--cf-orange); color: white; font-weight: 600; }
+    .btn-cf:hover { background: #d4601a; border-color: #d4601a; color: white; }
+    .form-control, .form-select {
+      background: #0d1b2a;
+      border-color: var(--cf-border);
+      color: #e0e0e0;
+    }
+    .form-control:focus, .form-select:focus {
+      background: #0d1b2a;
+      border-color: var(--cf-orange);
+      color: #e0e0e0;
+      box-shadow: 0 0 0 3px rgba(244,128,36,0.2);
+    }
+    .form-control::placeholder { color: #4b5563; }
+    .badge-proxied { background: var(--cf-orange); }
+    .badge-direct { background: #374151; color: #9ca3af; }
+    .stat-card { text-align: center; padding: 1.5rem 1rem; }
+    .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--cf-orange); }
+    .stat-label { color: #6b7280; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    pre.config-output {
+      background: #0d1117;
+      border: 1px solid var(--cf-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      color: #a5f3fc;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .status-ok { color: #34d399; }
+    .status-warn { color: #fbbf24; }
+    .status-err { color: #f87171; }
+    .page-header {
+      border-bottom: 1px solid var(--cf-border);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .page-header h4 { color: var(--cf-orange); margin: 0; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="container-fluid p-0">
+  <div class="row g-0">
+
+    <!-- Sidebar -->
+    <nav class="col-auto sidebar d-flex flex-column" style="width:220px; min-width:220px;">
+      <div class="text-center py-3 mb-2">
+        <div class="sidebar-brand">
+          <i class="bi bi-cloud-fill"></i> Cloudflare
+        </div>
+        <small class="text-muted" style="font-size:0.72rem;">Route Manager</small>
+      </div>
+      <hr style="border-color:var(--cf-border); margin: 0 0.5rem 0.75rem;">
+      <ul class="nav flex-column flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'dns_records' %}active{% endif %}" href="/dns">
+            <i class="bi bi-diagram-3-fill"></i> DNS-Einträge
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'tunnel' in (request.endpoint or '') %}active{% endif %}" href="/tunnels">
+            <i class="bi bi-bezier2"></i> Tunnel-Routen
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'prox' in (request.endpoint or '') %}active{% endif %}" href="/proxies">
+            <i class="bi bi-shield-check-fill"></i> Trusted Proxies
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'npm' in (request.endpoint or '') %}active{% endif %}" href="/npm">
+            <i class="bi bi-terminal-fill"></i> NPM-Hilfe
+          </a>
+        </li>
+      </ul>
+      <div style="padding: 0.75rem; font-size: 0.7rem; color: #374151; text-align:center;">
+        v1.0.0
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="col p-4" style="min-height:100vh;">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} alert-dismissible fade show mb-3" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

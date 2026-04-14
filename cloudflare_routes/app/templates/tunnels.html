@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="bi bi-bezier2"></i> Tunnel-Routen</h4>
+</div>
+
+{% if error %}
+  <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+{% endif %}
+
+{% if not tunnels %}
+  <div class="card">
+    <div class="card-body text-center py-5 text-muted">
+      <i class="bi bi-bezier2" style="font-size:3rem; opacity:0.4;"></i>
+      <p class="mt-3 mb-0">Keine Tunnel gefunden. Prüfe die Account-ID in den Addon-Einstellungen.</p>
+    </div>
+  </div>
+{% endif %}
+
+{% for tunnel in tunnels %}
+  {% set cfg = tunnel_configs.get(tunnel.id, {}) %}
+  {% set ingress = cfg.get('config', {}).get('ingress', []) %}
+  {% set routes = ingress | selectattr('hostname', 'defined') | list %}
+
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <i class="bi bi-bezier2 me-2"></i>
+        <strong>{{ tunnel.name }}</strong>
+        <code class="ms-2 small text-muted">{{ tunnel.id[:16] }}…</code>
+      </div>
+      <span class="badge {{ 'bg-success' if tunnel.status == 'healthy' else 'bg-secondary' }}">
+        {{ tunnel.status | default('unbekannt') }}
+      </span>
+    </div>
+    <div class="card-body p-0">
+
+      <!-- Routen-Tabelle -->
+      {% if routes %}
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th>Service / Ziel</th>
+              <th style="width:60px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for route in routes %}
+            <tr>
+              <td><code style="color:#a5f3fc;">{{ route.hostname }}</code></td>
+              <td class="text-muted small">{{ route.service }}</td>
+              <td>
+                <form method="POST" action="/tunnels/{{ tunnel.id }}/routes/delete"
+                      onsubmit="return confirm('Route {{ route.hostname }} wirklich entfernen?')">
+                  <input type="hidden" name="hostname" value="{{ route.hostname }}">
+                  <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted text-center small py-3 mb-0">Keine Routen konfiguriert.</p>
+      {% endif %}
+
+      <!-- Neue Route hinzufügen -->
+      <div class="p-3 border-top" style="border-color:var(--cf-border) !important;">
+        <p class="small text-muted mb-2"><i class="bi bi-plus-circle me-1"></i><strong>Neue Route hinzufügen</strong></p>
+        <form method="POST" action="/tunnels/{{ tunnel.id }}/routes/add">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <input type="text" name="hostname" class="form-control form-control-sm"
+                     placeholder="sub.example.com" required>
+            </div>
+            <div class="col-md-5">
+              <input type="text" name="service" class="form-control form-control-sm"
+                     placeholder="http://192.168.1.100:8123" required>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-cf btn-sm w-100">
+                <i class="bi bi-plus-lg me-1"></i>Hinzufügen
+              </button>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small class="text-muted">
+              Dienst-Formate: <code>http://host:port</code>, <code>https://host:port</code>,
+              <code>tcp://host:port</code>, <code>ssh://host:22</code>
+            </small>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+{% endfor %}
+
+<!-- Hinweis -->
+<div class="card mt-2">
+  <div class="card-body small text-muted">
+    <i class="bi bi-info-circle me-1"></i>
+    <strong>Hinweis:</strong> Tunnel müssen im Cloudflare Dashboard erstellt worden sein.
+    Für neue Tunnel besuche
+    <a href="https://one.dash.cloudflare.com" target="_blank" class="text-warning">Cloudflare Zero Trust</a>.
+  </div>
+</div>
+{% endblock %}

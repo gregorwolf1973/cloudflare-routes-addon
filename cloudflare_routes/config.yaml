@@ -1,0 +1,37 @@
+name: "Cloudflare Route Manager"
+description: "Verwalte Cloudflare DNS-Einträge und Tunnel-Routen direkt aus Home Assistant. Trägt automatisch Cloudflare IPs als trusted_proxies ein."
+version: "1.0.0"
+url: "https://github.com/gregorwolf1973/cloudflare-routes-addon"
+slug: "cloudflare_routes"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: services
+boot: auto
+ingress: true
+ingress_port: 8200
+panel_icon: "mdi:cloud-outline"
+panel_title: "Cloudflare Routes"
+hassio_api: false
+options:
+  cloudflare_api_token: ""
+  cloudflare_email: ""
+  cloudflare_global_api_key: ""
+  zone_id: ""
+  account_id: ""
+  domain: ""
+  update_trusted_proxies: true
+  log_level: "info"
+schema:
+  cloudflare_api_token: str
+  cloudflare_email: str
+  cloudflare_global_api_key: str
+  zone_id: str
+  account_id: str
+  domain: str
+  update_trusted_proxies: bool
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+map:
+  - config:rw

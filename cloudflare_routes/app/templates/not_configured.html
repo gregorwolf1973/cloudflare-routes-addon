@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="bi bi-gear-fill"></i> Konfiguration erforderlich</h4>
+</div>
+<div class="card">
+  <div class="card-body text-center py-5">
+    <i class="bi bi-cloud-slash" style="font-size:4rem; color:#f48024; opacity:0.6;"></i>
+    <h5 class="mt-3">Addon noch nicht konfiguriert</h5>
+    <p class="text-muted mb-4">
+      Bitte trage API-Token und Zone-ID in den Addon-Einstellungen ein.
+    </p>
+    <div class="card text-start mx-auto" style="max-width:500px;">
+      <div class="card-header">Benötigte Einstellungen</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-transparent text-light border-secondary">
+          <i class="bi bi-key-fill text-warning me-2"></i>
+          <strong>cloudflare_api_token</strong> – API-Token aus dem Cloudflare Dashboard
+        </li>
+        <li class="list-group-item bg-transparent text-light border-secondary">
+          <i class="bi bi-globe2 text-info me-2"></i>
+          <strong>zone_id</strong> – Zone-ID deiner Domain
+        </li>
+        <li class="list-group-item bg-transparent text-light border-secondary">
+          <i class="bi bi-person-circle text-success me-2"></i>
+          <strong>account_id</strong> – Account-ID (für Tunnel-Verwaltung)
+        </li>
+      </ul>
+    </div>
+    <p class="text-muted mt-4 small">
+      API-Token und Zone-ID findest du im
+      <a href="https://dash.cloudflare.com" target="_blank" class="text-warning">Cloudflare Dashboard</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

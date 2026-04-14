@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="bi bi-terminal-fill"></i> NPM-Konfigurationshilfe</h4>
+</div>
+
+<div class="row g-3">
+  <!-- Formular -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-sliders me-2"></i>Route konfigurieren</div>
+      <div class="card-body">
+        <form method="POST" action="/npm/generate">
+          <div class="mb-3">
+            <label class="form-label small text-muted">Öffentlicher Hostname</label>
+            <input type="text" name="hostname" class="form-control form-control-sm"
+                   placeholder="ha.{{ domain or 'example.com' }}"
+                   value="{{ form_data.get('hostname', '') }}" required>
+            <div class="form-text">z.B. homeassistant.deine-domain.de</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Interner Host / IP</label>
+            <input type="text" name="internal_host" class="form-control form-control-sm"
+                   placeholder="192.168.1.100"
+                   value="{{ form_data.get('internal_host', '') }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Interner Port</label>
+            <input type="number" name="internal_port" class="form-control form-control-sm"
+                   placeholder="8123"
+                   value="{{ form_data.get('internal_port', '8123') }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Internes Schema</label>
+            <select name="scheme" class="form-select form-select-sm">
+              <option value="http" {{ 'selected' if form_data.get('scheme','http')=='http' }}>HTTP</option>
+              <option value="https" {{ 'selected' if form_data.get('scheme')=='https' }}>HTTPS</option>
+            </select>
+          </div>
+          <hr style="border-color:var(--cf-border);">
+          <div class="mb-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="ws_support" id="ws"
+                     {{ 'checked' if form_data.get('ws_support') or not form_data }}>
+              <label class="form-check-label small" for="ws">WebSocket-Support (für HA)</label>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="cf_ssl" id="cfssl"
+                     {{ 'checked' if form_data.get('cf_ssl') or not form_data }}>
+              <label class="form-check-label small" for="cfssl">Cloudflare SSL (Origin Certificate)</label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="ha_mode" id="hamode"
+                     {{ 'checked' if form_data.get('ha_mode') or not form_data }}>
+              <label class="form-check-label small" for="hamode">HA configuration.yaml Snippet</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-cf btn-sm w-100">
+            <i class="bi bi-gear-fill me-1"></i>Konfiguration generieren
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- NPM Kurzanleitung -->
+    <div class="card mt-3">
+      <div class="card-header small"><i class="bi bi-question-circle me-2"></i>NPM – Schnellübersicht</div>
+      <div class="card-body small text-muted">
+        <ol class="ps-3 mb-0">
+          <li>NPM → <strong>Proxy Hosts</strong> → <em>Add Proxy Host</em></li>
+          <li>Domain Names: <em>dein-hostname.de</em></li>
+          <li>Scheme + Forward IP + Port eintragen</li>
+          <li><strong>WebSockets Support</strong> aktivieren (HA benötigt das)</li>
+          <li>SSL → <em>Request a new SSL Certificate</em> oder Origin Cert hochladen</li>
+          <li>„Force SSL" und „HTTP/2 Support" aktivieren</li>
+          <li>Advanced → Nginx-Konfiguration einfügen</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ausgabe -->
+  <div class="col-md-7">
+    {% if config %}
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-code-slash me-2"></i>Generierte Konfiguration</span>
+        <button class="btn btn-outline-secondary btn-sm" onclick="copyConfig()">
+          <i class="bi bi-clipboard"></i> Kopieren
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <pre class="config-output m-0" id="configOutput">{{ config }}</pre>
+      </div>
+    </div>
+    {% else %}
+    <div class="card">
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-arrow-left-circle" style="font-size:2.5rem; opacity:0.3;"></i>
+        <p class="mt-3 mb-0">Fülle das Formular aus und klicke auf „Generieren".</p>
+      </div>
+    </div>
+
+    <!-- Beispiel-Konfigurationen -->
+    <div class="card mt-3">
+      <div class="card-header small"><i class="bi bi-bookmark-fill me-2"></i>Häufige Dienste</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-transparent border-secondary small text-muted">
+          <strong style="color:#a5f3fc;">Home Assistant</strong> – Port 8123, Schema http, WebSocket an
+        </li>
+        <li class="list-group-item bg-transparent border-secondary small text-muted">
+          <strong style="color:#a5f3fc;">Portainer</strong> – Port 9000 (oder 9443 für HTTPS), Schema http
+        </li>
+        <li class="list-group-item bg-transparent border-secondary small text-muted">
+          <strong style="color:#a5f3fc;">Grafana</strong> – Port 3000, Schema http
+        </li>
+        <li class="list-group-item bg-transparent border-secondary small text-muted">
+          <strong style="color:#a5f3fc;">Node-RED</strong> – Port 1880, Schema http, WebSocket an
+        </li>
+        <li class="list-group-item bg-transparent border-secondary small text-muted">
+          <strong style="color:#a5f3fc;">Nextcloud</strong> – Port 443, Schema https
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function copyConfig() {
+  const text = document.getElementById('configOutput').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Kopiert!';
+    setTimeout(() => btn.innerHTML = '<i class="bi bi-clipboard"></i> Kopieren', 2000);
+  });
+}
+</script>
+{% endblock %}

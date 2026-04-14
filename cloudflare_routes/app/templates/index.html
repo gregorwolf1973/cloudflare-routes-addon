@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
+  {% if stats.zone_name %}
+    <span class="badge" style="background:rgba(244,128,36,0.2); color:#f48024; font-size:0.85rem; padding:0.4rem 0.8rem;">
+      <i class="bi bi-globe2"></i> {{ stats.zone_name }}
+    </span>
+  {% endif %}
+</div>
+
+{% if error %}
+  <div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Verbindungsfehler:</strong> {{ error }}
+  </div>
+{% endif %}
+
+<!-- Status-Karten -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card">
+      {% if stats.connected %}
+        <div class="stat-value status-ok"><i class="bi bi-check-circle-fill" style="font-size:2rem;"></i></div>
+        <div class="stat-label mt-1">Verbunden</div>
+      {% else %}
+        <div class="stat-value status-err"><i class="bi bi-x-circle-fill" style="font-size:2rem;"></i></div>
+        <div class="stat-label mt-1">Nicht verbunden</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="stat-value">{{ stats.dns_count }}</div>
+      <div class="stat-label">DNS-Einträge</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="stat-value">{{ stats.tunnel_count }}</div>
+      <div class="stat-label">Tunnel</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      {% if cf_missing == 0 %}
+        <div class="stat-value status-ok" style="font-size:1.8rem;">
+          <i class="bi bi-shield-fill-check"></i>
+        </div>
+        <div class="stat-label mt-1">Proxies vollständig</div>
+      {% else %}
+        <div class="stat-value status-warn" style="font-size:1.8rem;">
+          <i class="bi bi-shield-exclamation"></i>
+        </div>
+        <div class="stat-label mt-1">{{ cf_missing }} IPs fehlen</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Schnellzugriff -->
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-diagram-3-fill me-2"></i>DNS-Verwaltung</div>
+      <div class="card-body">
+        <p class="text-muted small">DNS-Einträge deiner Zone anzeigen, erstellen und löschen.</p>
+        <a href="/dns" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>DNS-Einträge öffnen</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-bezier2 me-2"></i>Tunnel-Routen</div>
+      <div class="card-body">
+        <p class="text-muted small">Cloudflare Tunnel verwalten und neue Routen konfigurieren.</p>
+        <a href="/tunnels" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Tunnel öffnen</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <i class="bi bi-shield-check-fill me-2"></i>Trusted Proxies
+        {% if cf_missing > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ cf_missing }} fehlend</span>
+        {% else %}
+          <span class="badge bg-success ms-2">OK</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <p class="text-muted small">
+          Cloudflare IP-Bereiche automatisch in <code>configuration.yaml</code> eintragen.
+        </p>
+        <a href="/proxies" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>Proxies verwalten</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-terminal-fill me-2"></i>NPM-Konfigurationshilfe</div>
+      <div class="card-body">
+        <p class="text-muted small">Nginx Proxy Manager Einstellungen und Nginx-Konfiguration generieren.</p>
+        <a href="/npm" class="btn btn-cf btn-sm"><i class="bi bi-arrow-right-circle me-1"></i>NPM-Hilfe öffnen</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

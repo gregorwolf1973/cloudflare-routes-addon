@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="bi bi-diagram-3-fill"></i> DNS-Einträge</h4>
+</div>
+
+{% if error %}
+  <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+{% endif %}
+
+<!-- Neuen Eintrag erstellen -->
+<div class="card mb-4">
+  <div class="card-header"><i class="bi bi-plus-circle-fill me-2"></i>Neuen DNS-Eintrag erstellen</div>
+  <div class="card-body">
+    <form method="POST" action="/dns/create">
+      <div class="row g-3">
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Typ</label>
+          <select name="type" class="form-select form-select-sm" required>
+            <option value="A">A</option>
+            <option value="AAAA">AAAA</option>
+            <option value="CNAME">CNAME</option>
+            <option value="MX">MX</option>
+            <option value="TXT">TXT</option>
+            <option value="SRV">SRV</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Name</label>
+          <input type="text" name="name" class="form-control form-control-sm" placeholder="sub oder @" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small text-muted">Inhalt (IP / Ziel)</label>
+          <input type="text" name="content" class="form-control form-control-sm" placeholder="1.2.3.4 oder hostname" required>
+        </div>
+        <div class="col-md-1">
+          <label class="form-label small text-muted">TTL</label>
+          <input type="number" name="ttl" class="form-control form-control-sm" value="1" min="1">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <div class="form-check form-switch ms-1">
+            <input class="form-check-input" type="checkbox" name="proxied" value="true" id="proxied" checked>
+            <label class="form-check-label small text-muted" for="proxied">Proxy</label>
+          </div>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="submit" class="btn btn-cf btn-sm w-100">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Eintrags-Tabelle -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-list-ul me-2"></i>Vorhandene Einträge</span>
+    <span class="badge" style="background:rgba(244,128,36,0.2); color:#f48024;">{{ records|length }} Einträge</span>
+  </div>
+  {% if records %}
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Name</th>
+          <th>Inhalt</th>
+          <th>TTL</th>
+          <th>Proxy</th>
+          <th style="width:60px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records|sort(attribute='type') %}
+        <tr>
+          <td>
+            <span class="badge" style="background:var(--cf-header); font-size:0.75rem; letter-spacing:0.05em;">
+              {{ r.type }}
+            </span>
+          </td>
+          <td><code style="color:#a5f3fc;">{{ r.name }}</code></td>
+          <td class="text-muted small">{{ r.content }}</td>
+          <td class="text-muted small">{{ r.ttl if r.ttl != 1 else 'Auto' }}</td>
+          <td>
+            {% if r.get('proxied') %}
+              <span class="badge badge-proxied">
+                <i class="bi bi-cloud-fill"></i> Aktiv
+              </span>
+            {% else %}
+              <span class="badge badge-direct">
+                <i class="bi bi-cloud-slash"></i> DNS
+              </span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" action="/dns/delete/{{ r.id }}"
+                  onsubmit="return confirm('Eintrag {{ r.name }} wirklich löschen?')">
+              <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-4">
+      <i class="bi bi-inbox" style="font-size:2rem;"></i>
+      <p class="mt-2 mb-0">Keine DNS-Einträge vorhanden.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
