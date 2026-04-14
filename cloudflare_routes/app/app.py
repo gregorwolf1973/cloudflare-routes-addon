@@ -61,13 +61,19 @@ def index():
         error = str(e)
         log.error("Dashboard-Fehler: %s", e)
 
-    present, missing = ha_config.cf_ips_in_config()
+    try:
+        present, missing = ha_config.cf_ips_in_config()
+        cf_present, cf_missing = len(present), len(missing)
+    except Exception as e:
+        log.warning("Proxy-Status konnte nicht gelesen werden: %s", e)
+        cf_present, cf_missing = 0, 0
+
     return render_template(
         "index.html",
         stats=stats,
         error=error,
-        cf_present=len(present),
-        cf_missing=len(missing),
+        cf_present=cf_present,
+        cf_missing=cf_missing,
         options=get_options(),
     )
 
