@@ -80,7 +80,7 @@
           <th>Inhalt</th>
           <th>TTL</th>
           <th>Proxy</th>
-          <th style="width:44px;"></th>
+          <th style="width:80px;"></th>
         </tr>
       </thead>
       <tbody>
@@ -100,11 +100,18 @@
               <span class="badge badge-dim">DNS</span>
             {% endif %}
           </td>
-          <td>
+          <td style="display:flex;gap:4px;">
+            <!-- Edit -->
+            <button type="button" class="btn btn-ghost btn-sm"
+                    onclick="openEdit('{{ r.id }}','{{ r.type }}','{{ r.name }}','{{ r.content | replace("'", "\\'") }}','{{ r.ttl }}','{{ r.get('proxied', False) | lower }}')"
+                    title="Bearbeiten">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <!-- Delete -->
             <form method="POST" action="{{ url_for('delete_dns', record_id=r.id) }}"
                   onsubmit="return confirm('{{ r.name }} wirklich löschen?')">
-              <button type="submit" class="btn btn-danger btn-sm">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              <button type="submit" class="btn btn-danger btn-sm" title="Löschen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
               </button>
             </form>
           </td>
@@ -120,4 +127,79 @@
     </div>
   {% endif %}
 </div>
+
+<!-- Edit-Modal -->
+<div id="editOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+    <div style="font-size:16px;font-weight:700;color:var(--text-bright);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Eintrag bearbeiten
+    </div>
+    <form id="editForm" method="POST">
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <div class="form-group" style="max-width:100px;">
+          <label class="field-label">Typ</label>
+          <select name="type" id="eType">
+            <option value="A">A</option>
+            <option value="AAAA">AAAA</option>
+            <option value="CNAME">CNAME</option>
+            <option value="MX">MX</option>
+            <option value="TXT">TXT</option>
+            <option value="SRV">SRV</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Name</label>
+          <input type="text" name="name" id="eName" required>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="field-label">Inhalt (IP / Ziel)</label>
+        <input type="text" name="content" id="eContent" required>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:flex-end;">
+        <div class="form-group" style="max-width:100px;">
+          <label class="field-label">TTL</label>
+          <input type="number" name="ttl" id="eTtl" min="1">
+        </div>
+        <div class="toggle-wrap" style="padding-bottom:4px;">
+          <input type="checkbox" name="proxied" value="true" id="eProxied">
+          <span>Cloudflare Proxy aktiv</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button type="button" class="btn btn-ghost" onclick="closeEdit()">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Speichern
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const overlay = document.getElementById('editOverlay');
+
+function openEdit(id, type, name, content, ttl, proxied) {
+  document.getElementById('editForm').action =
+    '{{ url_for("update_dns", record_id="__ID__") }}'.replace('__ID__', id);
+  document.getElementById('eType').value    = type;
+  document.getElementById('eName').value    = name;
+  document.getElementById('eContent').value = content;
+  document.getElementById('eTtl').value     = ttl;
+  document.getElementById('eProxied').checked = (proxied === 'true');
+  overlay.style.display = 'flex';
+}
+
+function closeEdit() { overlay.style.display = 'none'; }
+
+overlay.addEventListener('click', function(e) {
+  if (e.target === overlay) closeEdit();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEdit();
+});
+</script>
 {% endblock %}

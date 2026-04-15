@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+- Neu: DNS-Einträge bearbeiten über Edit-Modal (Typ, Name, Inhalt, TTL, Proxy)
+- Edit-Button in jeder Tabellenzeile, Modal schließt per Escape oder Klick außerhalb
+
 ## 1.0.3
 - Redesign: Bootstrap entfernt, Custom CSS analog zu SimpleNAS (CSS-Variablen, System-Fonts)
 - Sidebar durch horizontale Tab-Navigation ersetzt

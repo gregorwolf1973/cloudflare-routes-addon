@@ -121,6 +121,22 @@ def create_dns():
     return redirect(url_for("dns_records"))
 
 
+@app.route("/dns/update/<record_id>", methods=["POST"])
+def update_dns(record_id):
+    cf = get_cf()
+    try:
+        rtype = request.form["type"]
+        name = request.form["name"].strip()
+        content = request.form["content"].strip()
+        ttl = int(request.form.get("ttl", 1))
+        proxied = request.form.get("proxied") == "true"
+        cf.update_dns_record(record_id, rtype, name, content, ttl, proxied)
+        flash(f"DNS-Eintrag \"{name}\" wurde aktualisiert.", "success")
+    except Exception as e:
+        flash(f"Fehler beim Aktualisieren: {e}", "danger")
+    return redirect(url_for("dns_records"))
+
+
 @app.route("/dns/delete/<record_id>", methods=["POST"])
 def delete_dns(record_id):
     cf = get_cf()
