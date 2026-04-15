@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3
+- Redesign: Bootstrap entfernt, Custom CSS analog zu SimpleNAS (CSS-Variablen, System-Fonts)
+- Sidebar durch horizontale Tab-Navigation ersetzt
+- Farbschema: Blau (#03a9f4) als Akzentfarbe statt Orange
+- Inline SVGs statt Bootstrap Icons CDN – keine externen Abhängigkeiten mehr
+- Alle Templates neu geschrieben (index, dns, tunnels, proxies, npm_helper)
+
 ## 1.0.2
 - Fix: 404-Fehler bei Navigation hinter HA-Ingress (alle Links auf url_for() umgestellt)
 - Fix: IngressFix-Middleware liest X-Ingress-Path Header und setzt SCRIPT_NAME korrekt

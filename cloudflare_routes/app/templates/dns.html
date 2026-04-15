@@ -1,22 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page-header">
-  <h4><i class="bi bi-diagram-3-fill"></i> DNS-Einträge</h4>
-</div>
+<div class="page-header"><span class="page-title">DNS-Einträge</span></div>
 
 {% if error %}
-  <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+  <div class="flash flash-danger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    {{ error }}
+  </div>
 {% endif %}
 
 <!-- Neuen Eintrag erstellen -->
-<div class="card mb-4">
-  <div class="card-header"><i class="bi bi-plus-circle-fill me-2"></i>Neuen DNS-Eintrag erstellen</div>
+<div class="card" style="margin-bottom:12px;">
+  <div class="card-header">
+    <div class="card-header-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Neuen Eintrag erstellen
+    </div>
+  </div>
   <div class="card-body">
     <form method="POST" action="{{ url_for('create_dns') }}">
-      <div class="row g-3">
-        <div class="col-md-2">
-          <label class="form-label small text-muted">Typ</label>
-          <select name="type" class="form-select form-select-sm" required>
+      <div class="form-row">
+        <div class="form-group" style="max-width:90px;">
+          <label class="field-label">Typ</label>
+          <select name="type">
             <option value="A">A</option>
             <option value="AAAA">AAAA</option>
             <option value="CNAME">CNAME</option>
@@ -25,27 +31,29 @@
             <option value="SRV">SRV</option>
           </select>
         </div>
-        <div class="col-md-3">
-          <label class="form-label small text-muted">Name</label>
-          <input type="text" name="name" class="form-control form-control-sm" placeholder="sub oder @" required>
+        <div class="form-group">
+          <label class="field-label">Name</label>
+          <input type="text" name="name" placeholder="sub oder @" required>
         </div>
-        <div class="col-md-4">
-          <label class="form-label small text-muted">Inhalt (IP / Ziel)</label>
-          <input type="text" name="content" class="form-control form-control-sm" placeholder="1.2.3.4 oder hostname" required>
+        <div class="form-group" style="flex:2;">
+          <label class="field-label">Inhalt (IP / Ziel)</label>
+          <input type="text" name="content" placeholder="1.2.3.4 oder hostname" required>
         </div>
-        <div class="col-md-1">
-          <label class="form-label small text-muted">TTL</label>
-          <input type="number" name="ttl" class="form-control form-control-sm" value="1" min="1">
+        <div class="form-group" style="max-width:80px;">
+          <label class="field-label">TTL</label>
+          <input type="number" name="ttl" value="1" min="1">
         </div>
-        <div class="col-md-1 d-flex align-items-end">
-          <div class="form-check form-switch ms-1">
-            <input class="form-check-input" type="checkbox" name="proxied" value="true" id="proxied" checked>
-            <label class="form-check-label small text-muted" for="proxied">Proxy</label>
+        <div class="form-group" style="max-width:90px;">
+          <label class="field-label">Proxy</label>
+          <div class="toggle-wrap" style="padding-top:6px;">
+            <input type="checkbox" name="proxied" value="true" id="proxied" checked>
+            <span>Aktiv</span>
           </div>
         </div>
-        <div class="col-md-1 d-flex align-items-end">
-          <button type="submit" class="btn btn-cf btn-sm w-100">
-            <i class="bi bi-plus-lg"></i>
+        <div style="display:flex;align-items:flex-end;">
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Erstellen
           </button>
         </div>
       </div>
@@ -53,15 +61,18 @@
   </div>
 </div>
 
-<!-- Eintrags-Tabelle -->
+<!-- Tabelle -->
 <div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-list-ul me-2"></i>Vorhandene Einträge</span>
-    <span class="badge" style="background:rgba(244,128,36,0.2); color:#f48024;">{{ records|length }} Einträge</span>
+  <div class="card-header">
+    <div class="card-header-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Vorhandene Einträge
+    </div>
+    <span class="badge badge-accent">{{ records|length }}</span>
   </div>
   {% if records %}
-  <div class="table-responsive">
-    <table class="table table-sm mb-0">
+  <div style="overflow-x:auto;">
+    <table>
       <thead>
         <tr>
           <th>Typ</th>
@@ -69,36 +80,31 @@
           <th>Inhalt</th>
           <th>TTL</th>
           <th>Proxy</th>
-          <th style="width:60px;"></th>
+          <th style="width:44px;"></th>
         </tr>
       </thead>
       <tbody>
         {% for r in records|sort(attribute='type') %}
         <tr>
-          <td>
-            <span class="badge" style="background:var(--cf-header); font-size:0.75rem; letter-spacing:0.05em;">
-              {{ r.type }}
-            </span>
-          </td>
-          <td><code style="color:#a5f3fc;">{{ r.name }}</code></td>
-          <td class="text-muted small">{{ r.content }}</td>
-          <td class="text-muted small">{{ r.ttl if r.ttl != 1 else 'Auto' }}</td>
+          <td><span class="badge badge-dim">{{ r.type }}</span></td>
+          <td><code>{{ r.name }}</code></td>
+          <td style="color:var(--text-dim);font-size:12px;">{{ r.content }}</td>
+          <td style="color:var(--text-dim);font-size:12px;">{{ r.ttl if r.ttl != 1 else 'Auto' }}</td>
           <td>
             {% if r.get('proxied') %}
-              <span class="badge badge-proxied">
-                <i class="bi bi-cloud-fill"></i> Aktiv
+              <span class="badge badge-ok">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg>
+                An
               </span>
             {% else %}
-              <span class="badge badge-direct">
-                <i class="bi bi-cloud-slash"></i> DNS
-              </span>
+              <span class="badge badge-dim">DNS</span>
             {% endif %}
           </td>
           <td>
             <form method="POST" action="{{ url_for('delete_dns', record_id=r.id) }}"
-                  onsubmit="return confirm('Eintrag {{ r.name }} wirklich löschen?')">
-              <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2">
-                <i class="bi bi-trash3"></i>
+                  onsubmit="return confirm('{{ r.name }} wirklich löschen?')">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
               </button>
             </form>
           </td>
@@ -108,9 +114,9 @@
     </table>
   </div>
   {% else %}
-    <div class="card-body text-center text-muted py-4">
-      <i class="bi bi-inbox" style="font-size:2rem;"></i>
-      <p class="mt-2 mb-0">Keine DNS-Einträge vorhanden.</p>
+    <div class="card-body" style="text-align:center;color:var(--text-dim);padding:40px 16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;margin-bottom:8px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      <p style="font-size:13px;">Keine DNS-Einträge vorhanden.</p>
     </div>
   {% endif %}
 </div>

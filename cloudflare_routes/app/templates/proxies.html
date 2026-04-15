@@ -1,121 +1,113 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page-header">
-  <h4><i class="bi bi-shield-check-fill"></i> Trusted Proxies</h4>
+<div class="page-header"><span class="page-title">Trusted Proxies</span></div>
+
+<!-- Status + Aktionen -->
+<div class="card" style="margin-bottom:12px;">
+  <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      {% if missing|length == 0 %}
+        <div style="font-weight:600;color:var(--success);display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>
+          Alle Cloudflare IPs eingetragen
+        </div>
+        <p style="font-size:12px;color:var(--text-dim);">{{ present|length }} IP-Bereiche aktiv in <code>configuration.yaml</code></p>
+      {% else %}
+        <div style="font-weight:600;color:var(--warn);display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          {{ missing|length }} IP-Bereiche fehlen noch
+        </div>
+        <p style="font-size:12px;color:var(--text-dim);">{{ present|length }} von {{ (present|length + missing|length) }} Cloudflare IPs eingetragen</p>
+      {% endif %}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <form method="POST" action="{{ url_for('update_proxies') }}" style="display:flex;align-items:center;gap:8px;">
+        <div class="toggle-wrap">
+          <input type="checkbox" name="include_ipv6" value="true" id="ipv6" checked>
+          <span style="font-size:12px;color:var(--text-dim);">IPv6</span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Aktualisieren
+        </button>
+      </form>
+      <form method="POST" action="{{ url_for('remove_proxies') }}"
+            onsubmit="return confirm('Alle Cloudflare IPs aus trusted_proxies entfernen?')">
+        <button type="submit" class="btn btn-warn btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Entfernen
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 
-<!-- Status-Banner -->
-<div class="card mb-4">
-  <div class="card-body">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        {% if missing|length == 0 %}
-          <h6 class="status-ok mb-1">
-            <i class="bi bi-check-circle-fill me-2"></i>Alle Cloudflare IPs sind eingetragen
-          </h6>
-          <p class="text-muted small mb-0">
-            {{ present|length }} Cloudflare IP-Bereiche sind in <code>configuration.yaml</code> eingetragen.
-          </p>
-        {% else %}
-          <h6 class="status-warn mb-1">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ missing|length }} IP-Bereiche fehlen noch
-          </h6>
-          <p class="text-muted small mb-0">
-            {{ present|length }} von {{ (present|length + missing|length) }} Cloudflare IPs sind eingetragen.
-            Klicke auf „Aktualisieren" um alle hinzuzufügen.
-          </p>
-        {% endif %}
+<!-- IP-Listen -->
+<div class="grid-2" style="margin-bottom:12px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Cloudflare IPv4-Bereiche
       </div>
-      <div class="col-md-4 text-end">
-        <form method="POST" action="{{ url_for('update_proxies') }}" class="d-inline">
-          <div class="form-check form-switch d-inline-flex align-items-center me-3">
-            <input class="form-check-input me-2" type="checkbox" name="include_ipv6" value="true" id="ipv6switch" checked>
-            <label class="form-check-label small text-muted" for="ipv6switch">IPv6</label>
-          </div>
-          <button type="submit" class="btn btn-cf btn-sm">
-            <i class="bi bi-arrow-clockwise me-1"></i>Aktualisieren
-          </button>
-        </form>
-        <form method="POST" action="{{ url_for('remove_proxies') }}" class="d-inline ms-2"
-              onsubmit="return confirm('Alle Cloudflare IPs aus trusted_proxies entfernen?')">
-          <button type="submit" class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-x-lg me-1"></i>Entfernen
-          </button>
-        </form>
+      <span class="badge badge-accent">{{ cf_ipv4|length }}</span>
+    </div>
+    {% for ip in cf_ipv4 %}
+    <div class="list-item">
+      <code style="font-size:12px;">{{ ip }}</code>
+      {% if ip in present %}
+        <span class="badge badge-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg></span>
+      {% else %}
+        <span class="badge badge-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:10px;height:10px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Cloudflare IPv6-Bereiche
       </div>
+      <span class="badge badge-accent">{{ cf_ipv6|length }}</span>
     </div>
+    {% for ip in cf_ipv6 %}
+    <div class="list-item">
+      <code style="font-size:12px;">{{ ip }}</code>
+      {% if ip in present %}
+        <span class="badge badge-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg></span>
+      {% else %}
+        <span class="badge badge-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:10px;height:10px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      {% endif %}
+    </div>
+    {% endfor %}
   </div>
 </div>
 
-<div class="row g-3">
-  <!-- IPv4 -->
-  <div class="col-md-6">
-    <div class="card h-100">
-      <div class="card-header"><i class="bi bi-4-circle me-2"></i>Cloudflare IPv4-Bereiche</div>
-      <ul class="list-group list-group-flush">
-        {% for ip in cf_ipv4 %}
-        <li class="list-group-item bg-transparent border-secondary py-2 d-flex justify-content-between align-items-center">
-          <code style="font-size:0.82rem;">{{ ip }}</code>
-          {% if ip in present %}
-            <span class="badge bg-success"><i class="bi bi-check"></i></span>
-          {% else %}
-            <span class="badge bg-warning text-dark"><i class="bi bi-x"></i></span>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
+{% if other %}
+<div class="card" style="margin-bottom:12px;">
+  <div class="card-header">
+    <div class="card-header-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Weitere Einträge in configuration.yaml
     </div>
+    <span class="badge badge-dim">{{ other|length }}</span>
   </div>
-
-  <!-- IPv6 -->
-  <div class="col-md-6">
-    <div class="card h-100">
-      <div class="card-header"><i class="bi bi-6-circle me-2"></i>Cloudflare IPv6-Bereiche</div>
-      <ul class="list-group list-group-flush">
-        {% for ip in cf_ipv6 %}
-        <li class="list-group-item bg-transparent border-secondary py-2 d-flex justify-content-between align-items-center">
-          <code style="font-size:0.82rem;">{{ ip }}</code>
-          {% if ip in present %}
-            <span class="badge bg-success"><i class="bi bi-check"></i></span>
-          {% else %}
-            <span class="badge bg-warning text-dark"><i class="bi bi-x"></i></span>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
+  {% for ip in other %}
+  <div class="list-item">
+    <code style="font-size:12px;">{{ ip }}</code>
+    <span class="badge badge-dim">Benutzerdefiniert</span>
   </div>
-
-  <!-- Weitere eingetragene Proxies -->
-  {% if other %}
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header"><i class="bi bi-list-ul me-2"></i>Weitere trusted_proxies in configuration.yaml</div>
-      <ul class="list-group list-group-flush">
-        {% for ip in other %}
-        <li class="list-group-item bg-transparent border-secondary py-2">
-          <code style="font-size:0.82rem;">{{ ip }}</code>
-          <span class="badge badge-direct ms-2">Benutzerdefiniert</span>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-  {% endif %}
+  {% endfor %}
 </div>
+{% endif %}
 
-<!-- Info -->
-<div class="card mt-4">
-  <div class="card-body small text-muted">
-    <i class="bi bi-info-circle me-1"></i>
-    <strong>Warum trusted_proxies?</strong>
-    Wenn Home Assistant hinter Cloudflare läuft, kommen alle Anfragen von Cloudflare-IPs.
-    Ohne trusted_proxies erkennt HA nicht die echte Client-IP und blockiert ggf. Logins.
-    In der <code>configuration.yaml</code> muss außerdem <code>http.use_x_forwarded_for: true</code> gesetzt sein.
-    <br><br>
-    <strong>Hinweis:</strong> Das Addon überschreibt ggf. bestehende Kommentare in der configuration.yaml.
-    Sichere sie vorher mit einem Backup.
-  </div>
+<div class="info-box">
+  <strong>Warum trusted_proxies?</strong>
+  Anfragen über Cloudflare kommen aus Cloudflare-IPs. Ohne diesen Eintrag erkennt Home Assistant
+  die echte Client-IP nicht. Zusätzlich muss in der <code>configuration.yaml</code>
+  <code>http.use_x_forwarded_for: true</code> gesetzt sein.<br><br>
+  <strong>Hinweis:</strong> Das Addon kann bestehende Kommentare in der Datei überschreiben – vorher Backup erstellen.
 </div>
 {% endblock %}

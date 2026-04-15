@@ -1,142 +1,131 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page-header">
-  <h4><i class="bi bi-terminal-fill"></i> NPM-Konfigurationshilfe</h4>
-</div>
+<div class="page-header"><span class="page-title">NPM-Konfigurationshilfe</span></div>
 
-<div class="row g-3">
+<div style="display:grid;grid-template-columns:340px 1fr;gap:12px;align-items:start;">
+
   <!-- Formular -->
-  <div class="col-md-5">
-    <div class="card">
-      <div class="card-header"><i class="bi bi-sliders me-2"></i>Route konfigurieren</div>
-      <div class="card-body">
-        <form method="POST" action="{{ url_for('npm_generate') }}">
-          <div class="mb-3">
-            <label class="form-label small text-muted">Öffentlicher Hostname</label>
-            <input type="text" name="hostname" class="form-control form-control-sm"
-                   placeholder="ha.{{ domain or 'example.com' }}"
-                   value="{{ form_data.get('hostname', '') }}" required>
-            <div class="form-text">z.B. homeassistant.deine-domain.de</div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label small text-muted">Interner Host / IP</label>
-            <input type="text" name="internal_host" class="form-control form-control-sm"
-                   placeholder="192.168.1.100"
-                   value="{{ form_data.get('internal_host', '') }}" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label small text-muted">Interner Port</label>
-            <input type="number" name="internal_port" class="form-control form-control-sm"
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+        Route konfigurieren
+      </div>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('npm_generate') }}">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="field-label">Öffentlicher Hostname</label>
+          <input type="text" name="hostname"
+                 placeholder="ha.{{ domain or 'example.com' }}"
+                 value="{{ form_data.get('hostname', '') }}" required>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="field-label">Interner Host / IP</label>
+          <input type="text" name="internal_host"
+                 placeholder="192.168.1.100"
+                 value="{{ form_data.get('internal_host', '') }}" required>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <div class="form-group">
+            <label class="field-label">Port</label>
+            <input type="number" name="internal_port"
                    placeholder="8123"
                    value="{{ form_data.get('internal_port', '8123') }}" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label small text-muted">Internes Schema</label>
-            <select name="scheme" class="form-select form-select-sm">
-              <option value="http" {{ 'selected' if form_data.get('scheme','http')=='http' }}>HTTP</option>
-              <option value="https" {{ 'selected' if form_data.get('scheme')=='https' }}>HTTPS</option>
+          <div class="form-group">
+            <label class="field-label">Schema</label>
+            <select name="scheme">
+              <option value="http"  {{ 'selected' if form_data.get('scheme','http') == 'http' }}>HTTP</option>
+              <option value="https" {{ 'selected' if form_data.get('scheme') == 'https' }}>HTTPS</option>
             </select>
           </div>
-          <hr style="border-color:var(--cf-border);">
-          <div class="mb-2">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" name="ws_support" id="ws"
-                     {{ 'checked' if form_data.get('ws_support') or not form_data }}>
-              <label class="form-check-label small" for="ws">WebSocket-Support (für HA)</label>
-            </div>
-          </div>
-          <div class="mb-2">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" name="cf_ssl" id="cfssl"
-                     {{ 'checked' if form_data.get('cf_ssl') or not form_data }}>
-              <label class="form-check-label small" for="cfssl">Cloudflare SSL (Origin Certificate)</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" name="ha_mode" id="hamode"
-                     {{ 'checked' if form_data.get('ha_mode') or not form_data }}>
-              <label class="form-check-label small" for="hamode">HA configuration.yaml Snippet</label>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-cf btn-sm w-100">
-            <i class="bi bi-gear-fill me-1"></i>Konfiguration generieren
-          </button>
-        </form>
-      </div>
-    </div>
+        </div>
 
-    <!-- NPM Kurzanleitung -->
-    <div class="card mt-3">
-      <div class="card-header small"><i class="bi bi-question-circle me-2"></i>NPM – Schnellübersicht</div>
-      <div class="card-body small text-muted">
-        <ol class="ps-3 mb-0">
-          <li>NPM → <strong>Proxy Hosts</strong> → <em>Add Proxy Host</em></li>
-          <li>Domain Names: <em>dein-hostname.de</em></li>
-          <li>Scheme + Forward IP + Port eintragen</li>
-          <li><strong>WebSockets Support</strong> aktivieren (HA benötigt das)</li>
-          <li>SSL → <em>Request a new SSL Certificate</em> oder Origin Cert hochladen</li>
-          <li>„Force SSL" und „HTTP/2 Support" aktivieren</li>
-          <li>Advanced → Nginx-Konfiguration einfügen</li>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;">
+          <div class="toggle-wrap">
+            <input type="checkbox" name="ws_support" id="ws" {{ 'checked' if form_data.get('ws_support') or not form_data }}>
+            <span>WebSocket-Support (für HA)</span>
+          </div>
+          <div class="toggle-wrap">
+            <input type="checkbox" name="cf_ssl" id="cfssl" {{ 'checked' if form_data.get('cf_ssl') or not form_data }}>
+            <span>Cloudflare SSL-Hinweise</span>
+          </div>
+          <div class="toggle-wrap">
+            <input type="checkbox" name="ha_mode" id="hamode" {{ 'checked' if form_data.get('ha_mode') or not form_data }}>
+            <span>HA configuration.yaml Snippet</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          Konfiguration generieren
+        </button>
+      </form>
+
+      <!-- Kurzanleitung -->
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
+        <p style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">NPM Schnellübersicht</p>
+        <ol style="font-size:12px;color:var(--text-dim);padding-left:16px;line-height:1.8;">
+          <li>NPM → <strong style="color:var(--text);">Proxy Hosts</strong> → Add Proxy Host</li>
+          <li>Domain, Scheme, Forward IP + Port eintragen</li>
+          <li><strong style="color:var(--text);">Websockets Support</strong> aktivieren</li>
+          <li>SSL → Request Certificate oder Origin Cert</li>
+          <li>Force SSL + HTTP/2 aktivieren</li>
+          <li>Advanced → Nginx-Snippet einfügen</li>
         </ol>
       </div>
     </div>
   </div>
 
   <!-- Ausgabe -->
-  <div class="col-md-7">
+  <div>
     {% if config %}
     <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-code-slash me-2"></i>Generierte Konfiguration</span>
-        <button class="btn btn-outline-secondary btn-sm" onclick="copyConfig()">
-          <i class="bi bi-clipboard"></i> Kopieren
+      <div class="card-header">
+        <div class="card-header-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Generierte Konfiguration
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="copyConfig(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Kopieren
         </button>
       </div>
-      <div class="card-body p-0">
-        <pre class="config-output m-0" id="configOutput">{{ config }}</pre>
-      </div>
+      <pre id="configOutput" style="border-radius:0 0 var(--radius) var(--radius);border:none;margin:0;">{{ config }}</pre>
     </div>
     {% else %}
     <div class="card">
-      <div class="card-body text-center py-5 text-muted">
-        <i class="bi bi-arrow-left-circle" style="font-size:2.5rem; opacity:0.3;"></i>
-        <p class="mt-3 mb-0">Fülle das Formular aus und klicke auf „Generieren".</p>
+      <div class="card-body" style="text-align:center;color:var(--text-dim);padding:48px 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:12px;opacity:.4;"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <p style="font-size:13px;">Formular ausfüllen und generieren.</p>
       </div>
     </div>
 
-    <!-- Beispiel-Konfigurationen -->
-    <div class="card mt-3">
-      <div class="card-header small"><i class="bi bi-bookmark-fill me-2"></i>Häufige Dienste</div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item bg-transparent border-secondary small text-muted">
-          <strong style="color:#a5f3fc;">Home Assistant</strong> – Port 8123, Schema http, WebSocket an
-        </li>
-        <li class="list-group-item bg-transparent border-secondary small text-muted">
-          <strong style="color:#a5f3fc;">Portainer</strong> – Port 9000 (oder 9443 für HTTPS), Schema http
-        </li>
-        <li class="list-group-item bg-transparent border-secondary small text-muted">
-          <strong style="color:#a5f3fc;">Grafana</strong> – Port 3000, Schema http
-        </li>
-        <li class="list-group-item bg-transparent border-secondary small text-muted">
-          <strong style="color:#a5f3fc;">Node-RED</strong> – Port 1880, Schema http, WebSocket an
-        </li>
-        <li class="list-group-item bg-transparent border-secondary small text-muted">
-          <strong style="color:#a5f3fc;">Nextcloud</strong> – Port 443, Schema https
-        </li>
-      </ul>
+    <!-- Häufige Dienste -->
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">
+        <div class="card-header-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Häufige Dienste
+        </div>
+      </div>
+      <div class="list-item"><span style="font-size:13px;"><code>Home Assistant</code></span><span style="font-size:12px;color:var(--text-dim);">Port 8123 · http · WebSocket ✓</span></div>
+      <div class="list-item"><span style="font-size:13px;"><code>Portainer</code></span><span style="font-size:12px;color:var(--text-dim);">Port 9000 · http</span></div>
+      <div class="list-item"><span style="font-size:13px;"><code>Grafana</code></span><span style="font-size:12px;color:var(--text-dim);">Port 3000 · http</span></div>
+      <div class="list-item"><span style="font-size:13px;"><code>Node-RED</code></span><span style="font-size:12px;color:var(--text-dim);">Port 1880 · http · WebSocket ✓</span></div>
+      <div class="list-item"><span style="font-size:13px;"><code>Nextcloud</code></span><span style="font-size:12px;color:var(--text-dim);">Port 443 · https</span></div>
     </div>
     {% endif %}
   </div>
+
 </div>
 
 <script>
-function copyConfig() {
-  const text = document.getElementById('configOutput').innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.currentTarget;
-    btn.innerHTML = '<i class="bi bi-check-lg"></i> Kopiert!';
-    setTimeout(() => btn.innerHTML = '<i class="bi bi-clipboard"></i> Kopieren', 2000);
+function copyConfig(btn) {
+  navigator.clipboard.writeText(document.getElementById('configOutput').innerText).then(() => {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="20 6 9 17 4 12"/></svg> Kopiert!';
+    setTimeout(() => btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopieren', 2000);
   });
 }
 </script>

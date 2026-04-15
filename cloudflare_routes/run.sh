@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bashio
 set -e
 
-bashio::log.info "Starte Cloudflare Route Manager v1.0.2..."
+bashio::log.info "Starte Cloudflare Route Manager v1.0.3..."
 
 UPDATE_PROXIES=$(bashio::config 'update_trusted_proxies')
 LOG_LEVEL=$(bashio::config 'log_level')
