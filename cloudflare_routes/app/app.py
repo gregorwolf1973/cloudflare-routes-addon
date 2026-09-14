@@ -29,8 +29,23 @@ app.wsgi_app = IngressFix(ProxyFix(app.wsgi_app, x_for=1, x_proto=1))
 OPTIONS_FILE = "/data/options.json"
 PORT = int(os.environ.get("INGRESS_PORT", 8200))
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+# Die Option log_level wird von run.sh als LOG_LEVEL exportiert. Die
+# bashio-Levelnamen werden auf Python-Logging-Level abgebildet.
+LOG_LEVELS = {
+    "trace": logging.DEBUG,
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "notice": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "fatal": logging.CRITICAL,
+}
+LOG_LEVEL = LOG_LEVELS.get(os.environ.get("LOG_LEVEL", "info").strip().lower(), logging.INFO)
+
+logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
+# Ab "warning" verschwinden damit auch die Zugriffszeilen des Webservers.
+logging.getLogger("werkzeug").setLevel(LOG_LEVEL)
 
 
 def get_options():

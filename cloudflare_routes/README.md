@@ -33,7 +33,27 @@ direkt aus Home Assistant heraus.
 | `account_id` | Account-ID (für Tunnel-Verwaltung, Cloudflare Dashboard → rechte Spalte) |
 | `domain` | Deine Domain (z.B. `example.com`) |
 | `update_trusted_proxies` | Beim Start Cloudflare IPs automatisch in `configuration.yaml` eintragen |
-| `log_level` | Log-Level: `info`, `debug`, `warning`, etc. |
+| `log_level` | Detailgrad der Add-on-Protokollierung (`trace`, `debug`, `info`, `notice`, `warning`, `error`, `fatal`). Gilt für das Start-Skript und die Web-Oberfläche; ab `warning` entfallen auch die Zugriffszeilen des Webservers. Änderung wirkt erst nach einem Neustart des Add-ons. |
+
+## Trusted Proxies
+
+Damit Home Assistant die echte Besucher-IP hinter Cloudflare sieht, müssen die
+Cloudflare IP-Bereiche in `configuration.yaml` unter `http: trusted_proxies`
+stehen.
+
+- **Automatisch beim Start**: Option `update_trusted_proxies` aktivieren – das
+  Add-on trägt die IP-Bereiche bei jedem Start ein.
+- **Manuell über die Weboberfläche**: Reiter **Trusted Proxies** → Button
+  **Aktualisieren** trägt die fehlenden Cloudflare IPs ein.
+- **Wieder entfernen**: Auf demselben Reiter entfernt der Button **Entfernen**
+  alle Cloudflare IP-Bereiche wieder aus `trusted_proxies`. Eigene, nicht von
+  Cloudflare stammende Einträge bleiben dabei erhalten. Ist
+  `update_trusted_proxies` aktiv, werden die IPs beim nächsten Start erneut
+  eingetragen – die Option also vorher ausschalten.
+
+Nach jeder Änderung an `trusted_proxies` ist ein Neustart von Home Assistant
+nötig. Verwendet deine `configuration.yaml` für `http:` ein `!include`, meldet
+das Add-on dies und ändert nichts – dann bitte manuell pflegen.
 
 ## API-Token Berechtigungen
 

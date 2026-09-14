@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.5
+- Fix: Die Option `log_level` wird jetzt ausgewertet – `run.sh` setzt damit den
+  bashio-Log-Level, `app.py` das Python-Logging (inkl. der Zugriffszeilen des
+  Webservers, die ab `warning` entfallen). Bisher war der Wert wirkungslos.
+- Doku: Abschnitt „Trusted Proxies“ im Add-on-README – automatisch beim Start,
+  manuell über **Aktualisieren** und Entfernen der Cloudflare IPs über den
+  Button **Entfernen** (eigene Einträge bleiben erhalten).
+
 ## 1.0.4
 - Neu: DNS-Einträge bearbeiten über Edit-Modal (Typ, Name, Inhalt, TTL, Proxy)
 - Edit-Button in jeder Tabellenzeile, Modal schließt per Escape oder Klick außerhalb

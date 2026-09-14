@@ -1,11 +1,17 @@
 #!/usr/bin/with-contenv bashio
 set -e
 
-bashio::log.info "Starte Cloudflare Route Manager v1.0.4..."
+bashio::log.info "Starte Cloudflare Route Manager v1.0.5..."
 
 UPDATE_PROXIES=$(bashio::config 'update_trusted_proxies')
 LOG_LEVEL=$(bashio::config 'log_level')
 DOMAIN=$(bashio::config 'domain')
+
+# Log-Level auch fuer die bashio-Ausgaben dieses Skripts setzen; app.py
+# liest ihn ueber die exportierte Variable LOG_LEVEL.
+if bashio::config.has_value 'log_level'; then
+    bashio::log.level "${LOG_LEVEL}"
+fi
 
 export INGRESS_PORT=8200
 export INGRESS_PATH=$(bashio::addon.ingress_entry 2>/dev/null || echo "")
