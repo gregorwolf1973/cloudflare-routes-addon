@@ -1,11 +1,13 @@
 # Cloudflare Route Manager – Home Assistant Add-on
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/gregorwolf1973)
+
 Dieses Add-on ermöglicht die Verwaltung von Cloudflare DNS-Einträgen und Tunnel-Routen
 direkt aus Home Assistant heraus.
 
 ## Features
 
-- **DNS-Verwaltung** – Einträge anzeigen, erstellen und löschen (A, AAAA, CNAME, MX, TXT, SRV)
+- **DNS-Verwaltung** – Einträge anzeigen, erstellen, bearbeiten und löschen (A, AAAA, CNAME, MX, TXT, SRV)
 - **Tunnel-Routen** – Cloudflare Tunnel Routen konfigurieren (Hostname → Service)
 - **Trusted Proxies** – Cloudflare IP-Bereiche automatisch in `configuration.yaml` eintragen
 - **NPM-Hilfe** – Nginx Proxy Manager Konfiguration und Nginx-Snippets generieren
